@@ -7,6 +7,66 @@ const Home = (req, res) => {
 };
 
 
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        console.log(req.body);
+
+        const userExist = await User.findOne({ email });
+
+        if (!userExist) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, userExist.password);
+
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: "Invalid password" });
+        }
+
+        const token = await userExist.generateToken();
+
+        res.status(200).json({
+            message: "Login successful",
+            token,
+            userId: userExist._id.toString()
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 const register = async (req, res) => {
@@ -37,4 +97,4 @@ const register = async (req, res) => {
 
 
 
-module.exports = { Home,register };
+module.exports = { Home,register,login};
